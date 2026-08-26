@@ -1,0 +1,148 @@
+@import "tailwindcss";
+@theme inline { --color-ink:#0D1B2A; --color-sand:#F4F1EA; --color-mist:#E8EDF2; --color-linen:#FBF9F5; --color-ice:#F2F5F8; --color-brand:#126EA6; --color-sky:#63BCE5; --color-red:#C44545; --color-sand-line:hsl(33 20% 86%); --color-mist-line:hsl(204 15% 86%); --color-footer:hsl(33 20% 88%); --color-footer-line:hsl(33 20% 80%); }
+:root { --site-utility-height:0rem; --site-navigation-height:3.5rem; --site-header-height:calc(var(--site-utility-height) + var(--site-navigation-height)); }
+* { box-sizing:border-box; } html { scroll-behavior:smooth; } body { margin:0; background:#F4F1EA; color:#0D1B2A; font-family:Inter,"Plus Jakarta Sans",ui-sans-serif,system-ui,sans-serif; } section[id] { scroll-margin-top:3.5rem; } button,input,select,textarea { font:inherit; } ::selection { background:#63BCE5; color:#0D1B2A; } .container-page { width:min(100% - 2.5rem,88rem); margin-inline:auto; } .hero-container { width:min(100% - 2.5rem,88rem); } #gaeste,#eigentuemer,#region { padding-block:clamp(4rem,7vw,6rem); } #kontakt { padding-top:clamp(1rem,3vw,2.5rem); padding-bottom:calc(clamp(2.5rem,4vw,4rem) + clamp(4.5rem,8vw,7rem) - clamp(1rem,3vw,2.5rem)); } #eigentuemer .mt-16,#region .mt-16 { margin-top:clamp(3.5rem,6vw,5rem); } #eigentuemer .pt-14 { padding-top:clamp(3rem,5vw,4.5rem); } .hero-image-fade { mask-image:linear-gradient(to right,transparent 0%,#000 14%,#000 86%,transparent 100%),linear-gradient(to bottom,transparent 0%,#000 14%,#000 86%,transparent 100%); mask-composite:intersect; -webkit-mask-image:linear-gradient(to right,transparent 0%,#000 14%,#000 86%,transparent 100%),linear-gradient(to bottom,transparent 0%,#000 14%,#000 86%,transparent 100%); -webkit-mask-composite:source-in; } @media (min-width:768px) { section[id] { scroll-margin-top:6.75rem; } .container-page { width:min(100% - clamp(3rem,6vw,10rem),clamp(88rem,68vw,112rem)); } .hero-container { width:min(100% - clamp(3rem,6vw,10rem),88rem); } } @keyframes bob { 0%,100% { transform:translateY(0); } 50% { transform:translateY(7px); } } .animate-bob { animation:bob 1.8s ease-in-out infinite; }
+
+@media (min-width:768px) { .hero-container { width:min(100% - clamp(5rem,6vw,10rem),88rem); } }
+@media (min-width:768px) { :root { --site-utility-height:2.5rem; --site-navigation-height:4.25rem; } }
+@media (min-width:1024px) { .hero-container { width:min(100% - clamp(5rem,6vw,12rem),clamp(88rem,62vw,112rem)); } }
+@media (min-width:1536px) {
+  :root { --site-utility-height:2.75rem; --site-navigation-height:5rem; }
+
+  .container-page { width:min(100% - clamp(6rem,7vw,14rem),clamp(88rem,70vw,124rem)); }
+  .hero-container { width:min(100% - clamp(6rem,7vw,14rem),clamp(88rem,70vw,124rem)); }
+
+  header > div:first-child > .container-page { height:var(--site-utility-height); font-size:.8125rem; }
+  header > div:nth-child(2) > .container-page { height:var(--site-navigation-height); }
+  header > div:nth-child(2) > .container-page > a:first-child { height:3rem; width:11rem; }
+  header nav[aria-label="Hauptnavigation"] { gap:clamp(2rem,2.2vw,3rem); }
+  header nav[aria-label="Hauptnavigation"] > div > a { font-size:1rem; }
+
+  #hero .hero-container > div:nth-child(1),
+  #hero .hero-container > div:nth-child(3) { max-width:clamp(32rem,22vw,40rem); }
+  #hero .hero-container > div:nth-child(2) { left:13%; top:50%; width:74%; transform:translateY(-50%); }
+  #hero .hero-container > div:nth-child(1) h1 > span:first-child,
+  #hero .hero-container > div:nth-child(3) h2 > span:first-child { font-size:clamp(3.5rem,3.5vw,5rem); }
+  #hero .hero-container > div:nth-child(1) h1 > span:last-child,
+  #hero .hero-container > div:nth-child(3) h2 > span:last-child { font-size:clamp(2.8rem,2.8vw,4rem); }
+}
+@media (min-width:1920px) {
+  :root { --site-utility-height:3rem; --site-navigation-height:5.25rem; }
+  header > div:nth-child(2) > .container-page > a:first-child { height:3.25rem; width:12rem; }
+}
+@media (min-width:768px) and (max-width:1023px) { header button.md\:hidden { display:grid; } header > div.md\:hidden { display:block; } }
+
+.guest-cta-image-fade { mask-image:linear-gradient(to bottom,#000 0%,#000 58%,transparent 100%); -webkit-mask-image:linear-gradient(to bottom,#000 0%,#000 58%,transparent 100%); }
+@media (min-width:1024px) { .guest-cta-image-fade { mask-image:linear-gradient(to right,#000 0%,#000 42%,transparent 96%); -webkit-mask-image:linear-gradient(to right,#000 0%,#000 42%,transparent 96%); } }
+
+.guest-owner-color-transition { background:linear-gradient(to bottom,var(--color-sand) 0%,var(--color-sand) 82%,color-mix(in srgb,var(--color-sand) 78%,var(--color-mist)) 88%,color-mix(in srgb,var(--color-sand) 48%,var(--color-mist)) 94%,color-mix(in srgb,var(--color-mist) 94%,var(--color-brand)) 98%,color-mix(in srgb,var(--color-mist) 88%,var(--color-brand)) 100%); }
+.owner-color-transition { background:linear-gradient(to bottom,color-mix(in srgb,var(--color-mist) 88%,var(--color-brand)) 0%,color-mix(in srgb,var(--color-mist) 86%,var(--color-brand)) 28%,color-mix(in srgb,var(--color-mist) 82%,var(--color-brand)) 65%,color-mix(in srgb,var(--color-mist) 80%,var(--color-brand)) 100%); }
+.more-section-transition { background:linear-gradient(to bottom,color-mix(in srgb,var(--color-mist) 80%,var(--color-brand)) 0,color-mix(in srgb,var(--color-mist) 54%,var(--color-sand)) clamp(1.5rem,3vw,2.5rem),var(--color-sand) clamp(3rem,6vw,5rem),var(--color-sand) 100%); }
+
+/* Service-Admin: Die Kategorie bleibt der visuelle Rahmen, Services sind klar nachgeordnet. */
+[aria-label="Service-Kategorien"] > article {
+  border-color: var(--color-mist-line);
+  box-shadow: 0 10px 28px color-mix(in srgb, var(--color-ink) 7%, transparent);
+}
+
+[aria-label="Service-Kategorien"] > article > div:first-child {
+  background: linear-gradient(110deg, var(--color-ice), color-mix(in srgb, var(--color-ice) 84%, var(--color-mist)));
+}
+
+[aria-label="Service-Kategorien"] > article > div:first-child h2 {
+  font-size: clamp(1.35rem, 2vw, 1.7rem);
+}
+
+[aria-label="Service-Kategorien"] > article > div:first-child > div:last-child {
+  align-items: center;
+  border-top: 1px solid var(--color-mist-line);
+  padding-top: 0.85rem;
+}
+
+[aria-label="Service-Kategorien"] a[href*="service=neu"] {
+  align-items: center;
+  background: var(--color-brand);
+  border-radius: 0.75rem;
+  color: var(--color-ice);
+  display: inline-flex;
+  min-height: 2.75rem;
+  padding: 0.5rem 0.85rem;
+}
+
+/* Öffentliche Angebots-, Detail- und Formularflächen bleiben bewusst eckig.
+   Interaktive Buttons und Button-Links behalten ihr eigenständiges Design. */
+main.bg-sand > .container-page :not(button):not(a)[class*="rounded-"],
+main.bg-mist > .container-page :not(button):not(a)[class*="rounded-"] {
+  border-radius:0;
+}
+
+/* Desktop-Navigation: Dropdowns bleiben klar und rechteckig. */
+@media (min-width:1024px) {
+  header nav[aria-label="Hauptnavigation"] > div > div,
+  header nav[aria-label="Hauptnavigation"] > div > div > a {
+    border-radius:0;
+  }
+
+}
+
+[aria-label="Service-Kategorien"] a[href*="service=neu"]:hover {
+  background: var(--color-ink);
+}
+
+[aria-label="Service-Kategorien"] > article > .divide-y {
+  background: var(--color-mist);
+  border-left: 3px solid var(--color-brand);
+  margin: 1rem 1rem 1rem clamp(1rem, 3vw, 2.5rem);
+}
+
+[aria-label="Service-Kategorien"] > article > .divide-y > div {
+  background: var(--color-ice);
+}
+
+[aria-label="Service-Kategorien"] > article > .divide-y h3 {
+  font-size: 1rem;
+}
+
+[data-admin-ux="true"] main > div > p[aria-live="polite"] {
+  display:none;
+}
+
+[data-admin-ux="true"] .admin-field-invalid {
+  border-color:var(--color-red);
+  box-shadow:0 0 0 2px color-mix(in srgb,var(--color-red) 22%,transparent);
+}
+
+[data-admin-ux="true"] .admin-field-error {
+  color:var(--color-red);
+  display:block;
+  font-size:.75rem;
+  font-weight:600;
+  line-height:1.35;
+  margin-top:.4rem;
+}
+
+[data-admin-ux="true"] .admin-section-invalid {
+  border-color:var(--color-red);
+  box-shadow:0 0 0 2px color-mix(in srgb,var(--color-red) 18%,transparent);
+}
+
+[aria-label="Service-Kategorien"] > article > .divide-y > div > div:last-child {
+  border-top: 1px solid var(--color-mist-line);
+  padding-top: 0.65rem;
+}
+
+@media (min-width: 640px) {
+  [aria-label="Service-Kategorien"] > article > div:first-child > div:last-child {
+    border-left: 1px solid var(--color-mist-line);
+    border-top: 0;
+    padding-left: 1.25rem;
+    padding-top: 0;
+  }
+
+  [aria-label="Service-Kategorien"] > article > .divide-y > div > div:last-child {
+    border-left: 1px solid var(--color-mist-line);
+    border-top: 0;
+    padding-left: 1rem;
+    padding-top: 0;
+  }
+}

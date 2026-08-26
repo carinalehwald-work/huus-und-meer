@@ -1,0 +1,339 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Veroeffentlichungsstatus {
+  ENTWURF
+  VEROEFFENTLICHT
+  VERKAUFT
+  ARCHIVIERT
+}
+
+enum KontaktanfrageStatus {
+  NEU
+  IN_BEARBEITUNG
+  ERLEDIGT
+}
+
+enum BewerbungsStatus {
+  NEU
+  IN_BEARBEITUNG
+  ERLEDIGT
+}
+
+enum BewerbungsUnterlagenTyp {
+  LEBENSLAUF
+  SONSTIGE_UNTERLAGE
+}
+
+enum InhaltsbezugArt {
+  KEINER
+  HAUSBOOT
+  LIEGEPLATZ
+  SERVICE
+  STELLENANGEBOT
+}
+
+model HausbootAngebot {
+  id                  String                   @id
+  slug                String                   @unique
+  titel               String?
+  titelNormalisiert   String?                  @unique
+  beschreibung        String?
+  standort            String?
+  hafen               String?
+  liegeplatz          String?
+  preis               Decimal?
+  preisHinweis        String?
+  baujahr             String?
+  hersteller          String?
+  zulassung           String?
+  laenge              String?
+  breite              String?
+  wohnflaeche         String?
+  rumpftyp            String?
+  bootstyp            String?
+  designKategorie     String?
+  maximaleZuladung    String?
+  anzahlSchlafplaetze Int?
+  ausstattung         Json?
+  status              Veroeffentlichungsstatus @default(ENTWURF)
+  hervorgehoben       Boolean                  @default(false)
+  erstelltAm          DateTime                 @default(now())
+  geaendertAm         DateTime                 @updatedAt
+  bilder              HausbootBild[]
+  exposeEintraege     HausbootExposeEintrag[]
+  kontaktanfragen     Kontaktanfrage[]
+}
+
+model HausbootBild {
+  id                String          @id
+  hausbootAngebotId String
+  bildReferenz      String
+  istTitelbild      Boolean         @default(false)
+  reihenfolge       Int
+  altText           String?
+  hausbootAngebot   HausbootAngebot @relation(fields: [hausbootAngebotId], references: [id])
+
+  @@unique([hausbootAngebotId, reihenfolge])
+}
+
+model HausbootExposeKategorie {
+  id          String                 @id
+  name        String
+  nameNormalisiert String             @unique
+  reihenfolge Int
+  eintraege   HausbootExposeEintrag[]
+}
+
+model HausbootExposeEintrag {
+  id                String                  @id
+  hausbootAngebotId String
+  kategorieId       String
+  bezeichnung       String
+  beschreibung      String
+  reihenfolge       Int
+  hausbootAngebot   HausbootAngebot         @relation(fields: [hausbootAngebotId], references: [id])
+  kategorie         HausbootExposeKategorie @relation(fields: [kategorieId], references: [id])
+}
+
+model LiegeplatzAngebot {
+  id              String                   @id
+  slug            String                   @unique
+  titel           String?
+  titelNormalisiert String?                  @unique
+  beschreibung    String?
+  standort        String?
+  hafen           String?
+  preis           Decimal?
+  preisHinweis    String?
+  laenge          String?
+  breite          String?
+  moeglicheBootsgroesse String?
+  besonderheiten  String?
+  status          Veroeffentlichungsstatus @default(ENTWURF)
+  hervorgehoben   Boolean                  @default(false)
+  erstelltAm      DateTime                 @default(now())
+  geaendertAm     DateTime                 @updatedAt
+  bilder          LiegeplatzBild[]
+  kontaktanfragen Kontaktanfrage[]
+}
+
+model LiegeplatzBild {
+  id                 String             @id
+  liegeplatzAngebotId String
+  bildReferenz       String
+  istTitelbild       Boolean            @default(false)
+  reihenfolge        Int
+  altText            String?
+  liegeplatzAngebot  LiegeplatzAngebot  @relation(fields: [liegeplatzAngebotId], references: [id])
+
+  @@unique([liegeplatzAngebotId, reihenfolge])
+}
+
+model ServiceKategorie {
+  id           String    @id
+  name         String
+  nameNormalisiert String @unique
+  beschreibung String?
+  reihenfolge  Int
+  istAktiv     Boolean   @default(true)
+  services     Service[]
+}
+
+model Service {
+  id                 String            @id
+  serviceKategorieId String
+  titel              String
+  titelNormalisiert  String
+  beschreibung       String
+  details            String[]          @default([])
+  reihenfolge        Int
+  istAktiv           Boolean           @default(true)
+  serviceKategorie   ServiceKategorie  @relation(fields: [serviceKategorieId], references: [id])
+  kontaktanfragen    Kontaktanfrage[]
+
+  @@unique([serviceKategorieId, titelNormalisiert])
+}
+
+model Stellenangebot {
+  id                String                       @id
+  titel             String?
+  titelNormalisiert String?                      @unique
+  arbeitgeber       String?
+  arbeitspensum     String?
+  startdatum        DateTime?                    @db.Date
+  enddatum          DateTime?                    @db.Date
+  arbeitszeiten     String?
+  beschreibung      String?
+  status            Veroeffentlichungsstatus     @default(ENTWURF)
+  arbeitsorte       StellenangebotArbeitsort[]
+  aufgaben          StellenangebotAufgabe[]
+  qualifikationen   StellenangebotQualifikation[]
+  bewerbungskontaktId String?
+  bewerbungskontakt Bewerbungskontakt? @relation(fields: [bewerbungskontaktId], references: [id], onDelete: Restrict)
+  kontaktanfragen   Kontaktanfrage[]
+  bewerbungen       Bewerbung[]
+}
+
+model StellenangebotArbeitsort {
+  id               String         @id
+  stellenangebotId String
+  ort              String
+  reihenfolge      Int
+  stellenangebot   Stellenangebot @relation(fields: [stellenangebotId], references: [id])
+}
+
+model StellenangebotAufgabe {
+  id               String         @id
+  stellenangebotId String
+  aufgabe          String
+  reihenfolge      Int
+  stellenangebot   Stellenangebot @relation(fields: [stellenangebotId], references: [id])
+}
+
+model StellenangebotQualifikation {
+  id               String         @id
+  stellenangebotId String
+  qualifikation    String
+  reihenfolge      Int
+  stellenangebot   Stellenangebot @relation(fields: [stellenangebotId], references: [id])
+}
+
+model Bewerbungskontakt {
+  id               String         @id
+  ansprechpartner  String?
+  email            String?
+  telefon          String?
+  whatsapp         String?
+  adresse          String?
+  stellenangebote  Stellenangebot[]
+}
+
+model Bewerbung {
+  id                String           @id
+  stellenangebotId  String
+  vorname           String
+  nachname          String
+  email             String
+  telefon           String?
+  bewerbungstext    String
+  status            BewerbungsStatus @default(NEU)
+  erstelltAm        DateTime         @default(now())
+  geaendertAm       DateTime         @updatedAt
+  stellenangebot    Stellenangebot   @relation(fields: [stellenangebotId], references: [id], onDelete: Restrict)
+  unterlagen        BewerbungsUnterlage[]
+}
+
+model BewerbungsUnterlage {
+  id            String     @id
+  bewerbungId   String
+  typ           BewerbungsUnterlagenTyp @default(SONSTIGE_UNTERLAGE)
+  dateiname     String
+  mimeType      String
+  dateigroesse  Int
+  dateireferenz String
+  erstelltAm    DateTime   @default(now())
+  bewerbung     Bewerbung  @relation(fields: [bewerbungId], references: [id], onDelete: Cascade)
+}
+
+model Anfragetyp {
+  id                String          @id
+  name              String
+  inhaltsbezugArt   InhaltsbezugArt @default(KEINER)
+  istAktiv          Boolean         @default(true)
+  reihenfolge       Int
+  kontaktanfragen   Kontaktanfrage[]
+}
+
+model Kontaktanfrage {
+  id                  String               @id
+  anfragetypId        String
+  name                String
+  email               String
+  telefon             String?
+  nachricht           String
+  status              KontaktanfrageStatus @default(NEU)
+  hausbootAngebotId   String?
+  liegeplatzAngebotId String?
+  serviceId           String?
+  serviceKategorieName String?
+  stellenangebotId    String?
+  erstelltAm          DateTime             @default(now())
+  geaendertAm         DateTime             @updatedAt
+  anfragetyp          Anfragetyp           @relation(fields: [anfragetypId], references: [id], onDelete: Restrict)
+  hausbootAngebot     HausbootAngebot?     @relation(fields: [hausbootAngebotId], references: [id], onDelete: Restrict)
+  liegeplatzAngebot   LiegeplatzAngebot?   @relation(fields: [liegeplatzAngebotId], references: [id], onDelete: Restrict)
+  service             Service?             @relation(fields: [serviceId], references: [id], onDelete: Restrict)
+  stellenangebot      Stellenangebot?      @relation(fields: [stellenangebotId], references: [id], onDelete: Restrict)
+  interneNotizen      KontaktanfrageNotiz[]
+}
+
+model KontaktanfrageNotiz {
+  id               String         @id
+  kontaktanfrageId String
+  inhalt           String
+  erstelltAm       DateTime       @default(now())
+  kontaktanfrage   Kontaktanfrage @relation(fields: [kontaktanfrageId], references: [id])
+}
+
+model AdminRolle {
+  id            String          @id
+  name          String          @unique
+  adminBenutzer AdminBenutzer[]
+}
+
+model StammdatenV1 {
+  id                   String @id
+  unternehmensname     String?
+  inhaber              String?
+  website              String?
+  strasse              String?
+  plz                  String?
+  ort                  String?
+  land                 String?
+  email                String?
+  telefon              String?
+  whatsapp             String?
+  kontaktHinweis       String?
+  buerozeiten          Json?
+  instagramUrl         String?
+  facebookUrl          String?
+  tiktokUrl            String?
+  impressumName        String?
+  umsatzsteuerId       String?
+  steuernummer         String?
+  amtsgericht          String?
+  registerangabe       String?
+  bankName             String?
+  bankKontoinhaber     String?
+  bankKonto            String?
+  bankBlz              String?
+  bankIban             String?
+  bankBic              String?
+  geaendertAm          DateTime @updatedAt
+}
+
+model AdminBenutzer {
+  id           String     @id
+  adminRolleId String
+  name         String
+  email        String     @unique
+  passwortHash String?
+  istAktiv     Boolean    @default(true)
+  sitzungVersion Int      @default(0)
+  einrichtungscodeHash String?
+  einrichtungscodeLaeuftAb DateTime?
+  einrichtungscodeVerwendetAm DateTime?
+  adminRolle   AdminRolle @relation(fields: [adminRolleId], references: [id])
+}

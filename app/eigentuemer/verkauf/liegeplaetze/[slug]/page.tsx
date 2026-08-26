@@ -1,0 +1,13 @@
+import type { Metadata } from "next";
+import { notFound } from "next/navigation";
+import { connection } from "next/server";
+import { Footer } from "@/components/layout/footer";
+import { Header } from "@/components/layout/header";
+import { SaleDetailPage } from "@/components/sale-detail-page";
+import { ensureContactInquiryTypes } from "@/lib/contact-inquiry-types";
+import { publicMasterDataFrom } from "@/lib/public-master-data";
+import { prisma } from "@/lib/prisma";
+
+type Props = { params: Promise<{ slug: string }> };
+export async function generateMetadata({ params }: Props): Promise<Metadata> { const { slug } = await params; const item = await prisma.liegeplatzAngebot.findFirst({ where: { slug, status: "VEROEFFENTLICHT" }, select: { titel: true, beschreibung: true, bilder: { where: { istTitelbild: true }, take: 1, select: { bildReferenz: true } } } }); if (!item) return { title: "Liegeplatz nicht gefunden | Huus & Meer", robots: { index: false, follow: false } }; return { title: `${item.titel ?? "Liegeplatz"} | Huus & Meer`, description: item.beschreibung ?? "Liegeplatz zum Verkauf bei Huus & Meer.", openGraph: item.bilder[0] ? { images: [item.bilder[0].bildReferenz] } : undefined }; }
+export default async function BerthDetail({ params }: Props) { await connection(); const { slug } = await params; await ensureContactInquiryTypes(); const [item, masterData, inquiryTypes] = await Promise.all([prisma.liegeplatzAngebot.findFirst({ where: { slug, status: "VEROEFFENTLICHT" }, include: { bilder: { orderBy: [{ istTitelbild: "desc" }, { reihenfolge: "asc" }] } } }), prisma.stammdatenV1.findUnique({ where: { id: "zentral" } }), prisma.anfragetyp.findMany({ where: { istAktiv: true, inhaltsbezugArt: "LIEGEPLATZ" }, select: { id: true, name: true } })]); if (!item) notFound(); const master = publicMasterDataFrom(masterData); return <><Header masterData={master} /><main className="bg-mist"><SaleDetailPage inquiryTypes={inquiryTypes} objectKind="LIEGEPLATZ" object={{ id: item.id, titel: item.titel, beschreibung: item.beschreibung, preis: item.preis, preisHinweis: item.preisHinweis, images: item.bilder, primaryDetails: [{ label: "Standort", value: item.standort }, { label: "Hafen", value: item.hafen }, { label: "Liegeplatzgröße", value: [item.laenge, item.breite].filter(Boolean).join(" × ") || null }, { label: "Mögliche Bootsgröße", value: item.moeglicheBootsgroesse }], technicalDetails: [{ label: "Länge", value: item.laenge }, { label: "Breite", value: item.breite }, { label: "Besonderheiten", value: item.besonderheiten }] }} /></main><Footer masterData={master} /></>; }
